@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "delivery-app",
+    "slug": "delivery-app",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "deliveryapp",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.deliveryapp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.deliveryapp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon.png"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f2e4ab02-95e0-4e15-aa1d-028778b7168d"
+      }
+    }
+  }
+}
