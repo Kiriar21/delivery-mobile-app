@@ -460,6 +460,7 @@ app.get('/stats', authenticateToken, (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Network access: http://172.30.174.52:${PORT}`);
 });

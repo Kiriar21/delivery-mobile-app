@@ -2,7 +2,7 @@
   "expo": {
     "name": "delivery-app",
     "slug": "delivery-app",
-    "version": "1.0.0",
+    "version": "1.3.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -36,6 +36,14 @@
       "eas": {
         "projectId": "f2e4ab02-95e0-4e15-aa1d-028778b7168d"
       }
+    },
+    "updates": {
+      "enabled": false,
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/f2e4ab02-95e0-4e15-aa1d-028778b7168d"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

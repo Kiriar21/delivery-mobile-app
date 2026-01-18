@@ -100,13 +100,6 @@ export const DeliveryDetailsScreen = ({ route, navigation }: any) => {
         }
     };
 
-    // No local status state here really, we display what we got. 
-    // If user wants to change status, they might do it in Confirmation screen or we add controls here.
-    // The requirement says "Wyświetlenie szczegółów dostawy umożliwiającej zatwierdzenie realizacji tylko wybranych jej składników."
-    // This implies we select items HERE or in Confirmation. 
-    // Current flow: Details -> Confirmation.
-    // So here we just verify details. confirmation screen handles the " zatwierdzenie realizacji tylko wybranych jej składników".
-
     if (loading) {
         return (
             <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
@@ -341,9 +334,6 @@ export const DeliveryDetailsScreen = ({ route, navigation }: any) => {
                 </View>
             )}
 
-            {/* Courier - Confirm Delivery (Only if assigned to ME) */}
-            {/* We assume if status is assigned, the current user MUST be the one who assigned it (filtered by backend mainly, but robust to check). */}
-            {/* Ideally backend returns 'courier_id' to check ownership. For now assuming filtering holds. */}
             {(user?.role === 'courier' || user?.role === 'admin') &&
                 (delivery.statusCode === 'assigned' || delivery.statusCode === 'delivered_partial') && (
                     <Button

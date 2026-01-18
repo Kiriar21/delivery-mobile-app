@@ -6,8 +6,11 @@ import { Alert } from 'react-native';
 
 import { Platform } from 'react-native';
 
-// Auto-detect URL based on platform
-export const API_URL = Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+// API URL configuration
+// Web/Emulator: localhost | Physical device: change to your computer's IP
+export const API_URL = Platform.OS === 'web'
+    ? 'http://localhost:3000'
+    : 'http://10.0.2.2:3000'; // Android emulator uses 10.0.2.2 for localhost
 
 // Safe Storage Helper (AsyncStorage Only)
 const SafeStorage = {
