@@ -1,65 +1,104 @@
-# Starter Template with React Navigation
+# Delivery Mobile App
 
-This is a minimal starter template for React Native apps using Expo and React Navigation.
+Aplikacja mobilna (React Native + Expo) oraz serwer backendowy (Node.js) do zarządzania procesem dostaw. System obsługuje trzy role użytkowników: Klient, Kurier oraz Administrator.
 
-It includes the following:
+## Funkcjonalności
 
-- Example [Native Stack](https://reactnavigation.org/docs/native-stack-navigator) with a nested [Bottom Tab](https://reactnavigation.org/docs/bottom-tab-navigator)
-- Web support with [React Native for Web](https://necolas.github.io/react-native-web/)
-- TypeScript support and configured for React Navigation
-- Automatic [deep link](https://reactnavigation.org/docs/deep-linking) and [URL handling configuration](https://reactnavigation.org/docs/configuring-links)
-- Theme support [based on system appearance](https://reactnavigation.org/docs/themes/#using-the-operating-system-preferences)
-- Expo [Development Build](https://docs.expo.dev/develop/development-builds/introduction/) with [Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/)
+- **Logowanie:** Role-based access control (Admin, Kurier, Klient).
+- **Klient:**
+  - Podgląd swoich zamówień.
+  - Usuwanie nowych (nieprzypisanych) zamówień.
+  - Potwierdzanie odbioru dostawy.
+  - Zgłaszanie problemów z dostawą.
+- **Kurier:**
+  - Przeglądanie dostępnych zamówień.
+  - Pobieranie (przypisywanie) zamówień do realizacji.
+  - Rezygnacja z przypisanego zamówienia (jeśli nie rozpoczęto dostarczania).
+  - Zmiana statusów (Dostarczone, Problem rozwiązany).
+  - Edycja przewidywanej daty dostawy.
+  - Podgląd trasy na mapie (zewnętrzna aplikacja).
+- **Admin:**
+  - Pełny wgląd we wszystkie zamówienia i statystyki.
+  - Blokowanie użytkowników.
+- **System:**
+  - Automatyczne generowanie notatek systemowych przy kluczowych zdarzeniach (utworzenie zamówienia, przypisanie kuriera).
+  - Statystyki zablokowanych użytkowników dla Administratora.
 
-## Getting Started
+## Wymagania
 
-1. Create a new project using this template:
+- **Node.js** (wersja LTS zalecana)
+- **npm** lub **yarn**
+- Aplikacja **Expo Go** na telefonie (Android/iOS) lub emulator (Android Studio / Xcode).
 
-   ```sh
-   npx create-expo-app@latest --template react-navigation/template
+## Instalacja i Uruchomienie
+
+Projekt składa się z dwóch części: Backend (serwer) i Frontend (aplikacja mobilna). Obie części muszą działać jednocześnie.
+
+### 1. Pobranie projektu
+
+Sklonuj repozytorium lub pobierz pliki projektu.
+
+### 2. Uruchomienie Backend (Serwer)
+
+Backend zarządza bazą danych (SQLite) i API.
+
+1. Otwórz terminal w głównym katalogu projektu.
+2. Przejdź do katalogu backendu:
+   ```bash
+   cd backend
    ```
+3. Zainstaluj zależności:
+   ```bash
+   npm install
+   ```
+4. Skonfiguruj zmienne środowiskowe:
+   - Skopiuj plik `.env.example` i zmień jego nazwę na `.env`.
+   - (Opcjonalnie) Edytuj wartości w `.env`, jeśli chcesz zmienić port lub klucz JWT.
+   ```bash
+   cp .env.example .env
+   # lub ręcznie utwórz plik .env
+   ```
+5. Uruchom serwer:
+   ```bash
+   npm start
+   ```
+   Serwer powinien działać na porcie 3000 (np. `http://localhost:3000`).
+   *Baza danych `delivery.sqlite` zostanie utworzona automatycznie przy pierwszym uruchomieniu.*
 
-2. Edit the `app.json` file to configure the `name`, `slug`, `scheme` and bundle identifiers (`ios.bundleIdentifier` and `android.bundleIdentifier`) for your app.
+### 3. Uruchomienie Frontend (Aplikacja Mobilna/Web)
 
-3. Edit the `src/App.tsx` file to start working on your app.
+1. Otwórz **nowe okno terminala** w głównym katalogu projektu (`delivery-app`).
+2. Zainstaluj zależności:
+   ```bash
+   npm install
+   ```
+3. Uruchom aplikację Expo:
+   ```bash
+   npx expo start --clear
+   ```
+4. **Opcje uruchomienia:**
+   - **Na telefonie:** Zeskanuj kod QR za pomocą aplikacji **Expo Go** (Android) lub kamery (iOS). *Upewnij się, że telefon i komputer są w tej samej sieci Wi-Fi.*
+   - **W przeglądarce (Web):** Naciśnij klawisz `w` w terminalu.
+   - **Na emulatorze:** Naciśnij `a` (Android) lub `i` (iOS).
 
-## Running the app
+## Struktura Plików
 
-- Install the dependencies:
+- `backend/` - Kod serwera Node.js, API, baza danych SQLite.
+- `src/`
+  - `screens/` - Ekrany aplikacji (Logowanie, Lista, Szczegóły).
+  - `components/` - Komponenty wielokrotnego użytku (Karty, Przyciski).
+  - `context/` - Zarządzanie stanem (Auth, Theme).
+  - `types/` - Definicje typów TypeScript.
 
-  ```sh
-  npm install
-  ```
+## Uwagi dla Deweloperów
 
-- Start the development server:
+- Jeśli masz problemy z połączeniem na telefonie (błąd Network Error), upewnij się, że w pliku `backend/server.js` lub w konfiguracji klienta (Frontend) adres IP serwera jest poprawny (zamiast `localhost` użyj lokalnego IP komputera, np. `192.168.x.x`, jeśli testujesz na fizycznym urządzeniu).
+- Plik bazy danych `backend/delivery.sqlite` jest ignorowany przez git.
 
-  ```sh
-  npm start
-  ```
+## Domyślne Dane Logowania (Seed Data)
 
-- Build and run iOS and Android development builds:
+Po pierwszym uruchomieniu backendu, baza zostanie zasilona przykładowymi danymi. Przykładowe konta (jeśli zostały utworzone przez skrypt `database.js`):
 
-  ```sh
-  npm run ios
-  # or
-  npm run android
-  ```
-
-- In the terminal running the development server, press `i` to open the iOS simulator, `a` to open the Android device or emulator, or `w` to open the web browser.
-
-## Notes
-
-This project uses a [development build](https://docs.expo.dev/develop/development-builds/introduction/) and cannot be run with [Expo Go](https://expo.dev/go). To run the app with Expo Go, edit the `package.json` file, remove the `expo-dev-client` package and `--dev-client` flag from the `start` script.
-
-We highly recommend using the development builds for normal development and testing.
-
-The `ios` and `android` folder are gitignored in the project by default as they are automatically generated during the build process ([Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/)). This means that you should not edit these folders directly and use [config plugins](https://docs.expo.dev/config-plugins/) instead. However, if you need to edit these folders, you can remove them from the `.gitignore` file so that they are tracked by git.
-
-## Resources
-
-- [React Navigation documentation](https://reactnavigation.org/)
-- [Expo documentation](https://docs.expo.dev/)
-
----
-
-Demo assets are from [lucide.dev](https://lucide.dev/)
+- **Kurier:** `driver1` / `password`
+- **Klient:** `client1` / `password`
+- **Admin:** `admin1` / `password`

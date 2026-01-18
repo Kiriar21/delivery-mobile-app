@@ -5,7 +5,9 @@ import { MainTabParamList } from '../types/types';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DeliveriesScreen } from '../screens/DeliveriesScreen';
 import { InfoScreen } from '../screens/InfoScreen';
+import { AdminDashboardScreen } from '../screens/AdminDashboardScreen';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -15,6 +17,7 @@ const TabIcon = ({ name, color }: { name: string; color: string }) => (
 
 export const TabNavigator = () => {
     const { colors } = useTheme();
+    const { user } = useAuth();
 
     return (
         <Tab.Navigator
@@ -45,14 +48,52 @@ export const TabNavigator = () => {
                     tabBarIcon: ({ color }) => <TabIcon name="H" color={color} />
                 }}
             />
-            <Tab.Screen
-                name="Deliveries"
-                component={DeliveriesScreen}
-                options={{
-                    title: 'Dostawy',
-                    tabBarIcon: ({ color }) => <TabIcon name="D" color={color} />
-                }}
-            />
+
+            {/* Conditional Tabs */}
+            {user?.role === 'client' ? (
+                <>
+                    <Tab.Screen
+                        name="ClientActive"
+                        component={DeliveriesScreen}
+                        initialParams={{ filterType: 'client_active' }}
+                        options={{
+                            title: 'Zamówienia',
+                            tabBarIcon: ({ color }) => <TabIcon name="Z" color={color} />
+                        }}
+                    />
+                    <Tab.Screen
+                        name="ClientConfirm"
+                        component={DeliveriesScreen}
+                        initialParams={{ filterType: 'client_confirm' }}
+                        options={{
+                            title: 'Do Odbioru',
+                            tabBarIcon: ({ color }) => <TabIcon name="O" color={color} />
+                        }}
+                    />
+                </>
+            ) : (
+                <Tab.Screen
+                    name="Deliveries"
+                    component={DeliveriesScreen}
+                    options={{
+                        title: 'Dostawy',
+                        tabBarIcon: ({ color }) => <TabIcon name="D" color={color} />
+                    }}
+                />
+            )}
+
+            {/* Admin Dashboard Tab */}
+            {user?.role === 'admin' && (
+                <Tab.Screen
+                    name="AdminDashboard"
+                    component={AdminDashboardScreen}
+                    options={{
+                        title: 'Panel',
+                        tabBarIcon: ({ color }) => <TabIcon name="P" color={color} />
+                    }}
+                />
+            )}
+
             <Tab.Screen
                 name="Info"
                 component={InfoScreen}

@@ -36,3 +36,10 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Backend
+backend/node_modules/
+backend/.env
+*.sqlite
+*.db
+

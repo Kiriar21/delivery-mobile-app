@@ -1,42 +1,123 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import axios from 'axios';
+import { API_URL } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { mockDeliveries } from '../data/mockData';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 
 export const DeliveryConfirmationScreen = ({ route, navigation }: any) => {
     const { deliveryId } = route.params || {};
     const { colors } = useTheme();
-    const delivery = mockDeliveries.find(d => d.id === deliveryId);
-
-    // Local state for quantities and notes
-    const [quantities, setQuantities] = useState<{ [key: string]: string }>(() => {
-        const initial: { [key: string]: string } = {};
-        delivery?.products.forEach(p => {
-            initial[p.id] = (p.quantityDelivered ?? p.quantityOrdered).toString();
-        });
-        return initial;
-    });
-
-    const [notes, setNotes] = useState(delivery?.notes || '');
+    const [delivery, setDelivery] = useState<any>(null);
+    const [quantities, setQuantities] = useState<{ [key: string]: string }>({});
+    const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    // Fetch fresh details again to be sure
+    React.useEffect(() => {
+        const fetch = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/deliveries/${deliveryId}`);
+                const d = response.data;
+                setDelivery(d);
+                const initial: { [key: string]: string } = {};
+                d.items.forEach((p: any) => {
+                    const remaining = p.quantity - (p.delivered_quantity || 0);
+                    initial[p.id] = remaining.toString();
+                });
+                setQuantities(initial);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetch();
+    }, [deliveryId]);
+
 
     if (!delivery) return null;
 
-    const handleQuantityChange = (id: string, value: string) => {
-        setQuantities(prev => ({ ...prev, [id]: value }));
+    const handleQuantityChange = (id: string, text: string) => {
+        const item = delivery.items.find((p: any) => p.id === id);
+        if (!item) return;
+
+        const maxRemaining = item.quantity - (item.delivered_quantity || 0);
+        let cleaned = text.replace(/[^0-9]/g, '');
+
+        // Prevent leading zeros issues if needed, but parseInt handles it check logic
+        const numVal = parseInt(cleaned, 10);
+
+        if (!isNaN(numVal) && numVal > maxRemaining) {
+            cleaned = maxRemaining.toString();
+            // Optional: User feedback could go here
+        }
+
+        setQuantities(prev => ({ ...prev, [id]: cleaned }));
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
+        // Calculate total pending quantity
+        const totalPending = Object.values(quantities).reduce((acc, val) => {
+            const num = parseInt(val) || 0;
+            return acc + num;
+        }, 0);
+
+        if (totalPending <= 0) {
+            if (Platform.OS === 'web') {
+                window.alert('Musisz zgłosić dostarczenie przynajmniej jednego produktu.');
+            } else {
+                Alert.alert('Błąd', 'Musisz zgłosić dostarczenie przynajmniej jednego produktu.');
+            }
+            return;
+        }
+
+        // Confirmation before action (Web only for now, standard practice)
+        if (Platform.OS === 'web') {
+            const confirmAction = window.confirm("Czy na pewno chcesz zgłosić dostarczenie?");
+            if (!confirmAction) return; // Stop if user clicks Cancel
+        }
+
         setSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            // Updated Flow:
+            // 1. Send item updates (pending quantities)
+            // 2. Complete delivery (change status to waiting_for_client)
+
+            const itemsToUpdate = Object.keys(quantities).map(key => {
+                const qtyInput = parseInt(quantities[key]);
+                return {
+                    id: key,
+                    pending_quantity: isNaN(qtyInput) ? 0 : qtyInput
+                };
+            });
+
+            await axios.patch(`${API_URL}/deliveries/${deliveryId}/items`, { items: itemsToUpdate });
+            await axios.post(`${API_URL}/deliveries/${deliveryId}/complete`, {
+                status: 'waiting_for_client',
+                notes: notes // Send the notes entered by courier
+            });
+
+            const successMsg = 'Zgłoszono dostarczenie. Oczekiwanie na potwierdzenie klienta.';
+
+            if (Platform.OS === 'web') {
+                // Use alert for success, as there is nothing to "Cancel" anymore
+                window.alert(`Sukces: ${successMsg}`);
+                navigation.popToTop();
+            } else {
+                Alert.alert('Sukces', successMsg, [
+                    { text: 'OK', onPress: () => navigation.popToTop() }
+                ]);
+            }
+        } catch (e) {
+            console.error(e);
+            if (Platform.OS === 'web') {
+                window.alert('Wystąpił błąd podczas zatwierdzania.');
+            } else {
+                Alert.alert('Błąd', 'Wystąpił błąd podczas zatwierdzania.');
+            }
+        } finally {
             setSubmitting(false);
-            Alert.alert('Sukces', 'Dostawa została potwierdzona.', [
-                { text: 'OK', onPress: () => navigation.popToTop() }
-            ]);
-        }, 1000);
+        }
     };
 
     return (
@@ -55,11 +136,11 @@ export const DeliveryConfirmationScreen = ({ route, navigation }: any) => {
 
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>Produkty:</Text>
-                    {delivery.products.map(p => (
+                    {delivery.items.map((p: any) => (
                         <View key={p.id} style={[styles.productRow, { borderBottomColor: colors.border }]}>
                             <View style={styles.productInfo}>
                                 <Text style={[styles.productName, { color: colors.text }]}>{p.name}</Text>
-                                <Text style={[styles.productOrdered, { color: colors.textLight }]}>Zamówiono: {p.quantityOrdered}</Text>
+                                <Text style={[styles.productOrdered, { color: colors.textLight }]}>Zamówiono: {p.quantity}</Text>
                             </View>
                             <View style={styles.inputContainer}>
                                 <Text style={[styles.inputLabel, { color: colors.textLight }]}>Dostarczono:</Text>
@@ -73,6 +154,16 @@ export const DeliveryConfirmationScreen = ({ route, navigation }: any) => {
                         </View>
                     ))}
                 </View>
+
+                {/* Display Existing Notes History */}
+                {delivery.notes ? (
+                    <View style={styles.section}>
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Historia Uwag:</Text>
+                        <Card style={{ backgroundColor: colors.surface, padding: 12 }}>
+                            <Text style={{ color: colors.text }}>{delivery.notes}</Text>
+                        </Card>
+                    </View>
+                ) : null}
 
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>Uwagi:</Text>
@@ -88,7 +179,7 @@ export const DeliveryConfirmationScreen = ({ route, navigation }: any) => {
                 </View>
 
                 <Button
-                    title="Zatwierdź i Zakończ"
+                    title="Zgłoś Dostarczenie (Czekaj na klienta)"
                     onPress={handleConfirm}
                     loading={submitting}
                     style={styles.button}

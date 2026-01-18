@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Card } from '../components/Card';
 
 export const HomeScreen = () => {
     const { colors, theme, toggleTheme } = useTheme();
+    const { user, logout } = useAuth();
 
     const isDark = theme === 'dark';
 
@@ -31,7 +33,12 @@ export const HomeScreen = () => {
             </View>
 
             <View style={styles.footer}>
-                <Text style={[styles.footerText, { color: colors.secondary }]}>Zalogowano jako: Admin</Text>
+                <Text style={[styles.footerText, { color: colors.secondary }]}>
+                    Zalogowano jako: {user?.name || user?.username || 'Gość'}
+                </Text>
+                <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+                    <Text style={[styles.logoutText, { color: colors.error }]}>Wyloguj się</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -77,5 +84,13 @@ const styles = StyleSheet.create({
     },
     footerText: {
         fontSize: 14,
+        marginBottom: 12,
+    },
+    logoutButton: {
+        padding: 10,
+    },
+    logoutText: {
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

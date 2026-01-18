@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 export const LoginScreen = ({ navigation }: any) => {
     const { colors } = useTheme();
-    const [username, setUsername] = useState('admin');
-    const [password, setPassword] = useState('admin');
+    const { login } = useAuth();
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         setLoading(true);
-        // Mock network delay & check
-        setTimeout(() => {
-            setLoading(false);
-            if (username === 'admin' && password === 'admin') {
-                navigation.replace('Main');
+        try {
+            await login(username, password);
+            // Navigation verification happens in RootNavigator automatically via 'user' state
+        } catch (e: any) {
+            const msg = e.response?.data || 'Błąd logowania';
+            if (Platform.OS === 'web') {
+                window.alert(msg);
             } else {
-                Alert.alert('Błąd logowania', 'Nieprawidłowy login lub hasło.');
+                const { Alert } = require('react-native');
+                Alert.alert('Błąd', msg);
             }
-        }, 1000);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -58,6 +65,12 @@ export const LoginScreen = ({ navigation }: any) => {
                             title="Zaloguj się"
                             onPress={handleLogin}
                             loading={loading}
+                        />
+                        <Button
+                            title="Zarejestruj się"
+                            onPress={() => navigation.navigate('Register')}
+                            variant="secondary"
+                            style={{ marginTop: 12 }}
                         />
                     </View>
                 </View>

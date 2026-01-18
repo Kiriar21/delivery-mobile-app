@@ -18,6 +18,10 @@ interface ThemeColors {
     statusDeliveredText: string;
     statusPartial: string;
     statusPartialText: string;
+    statusWaiting: string;
+    statusWaitingText: string;
+    statusDisputed: string;
+    statusDisputedText: string;
 }
 
 export const lightColors: ThemeColors = {
@@ -39,27 +43,35 @@ export const lightColors: ThemeColors = {
     statusDeliveredText: '#388E3C',
     statusPartial: '#FFF3E0',
     statusPartialText: '#F57C00',
+    statusWaiting: '#E3F2FD', // Light Blue
+    statusWaitingText: '#0277BD',
+    statusDisputed: '#FFEBEE', // Light Red
+    statusDisputedText: '#C62828',
 };
 
 export const darkColors: ThemeColors = {
-    // Rider / VSCode (Dark)
-    background: '#1E1E1E',     // VSCode Dark
-    surface: '#252526',        // Sidebar/List
-    primary: '#007ACC',        // VSCode Blue
+    // Rider / VSCode (Dark) - High Contrast
+    background: '#121212',     // Almost Black
+    surface: '#1E1E1E',        // Dark Grey
+    primary: '#2196F3',        // Softer Blue
     primaryText: '#FFFFFF',
-    secondary: '#569CD6',      // Syntax Blue
-    text: '#D4D4D4',           // Light Grey
-    textLight: '#858585',      // Comment Grey
-    border: '#3E3E42',         // Dark Border
-    error: '#F48771',          // Soft Red
-    success: '#89D185',        // Soft Green
-    warning: '#DCDCAA',        // Gentle Yellow
-    statusToDeliver: '#4D4D4D',
-    statusToDeliverText: '#DCDCAA',
-    statusDelivered: '#2E3C43',
-    statusDeliveredText: '#89D185',
-    statusPartial: '#4D3830',
-    statusPartialText: '#D7BA7D',
+    secondary: '#64B5F6',      // Light Blue
+    text: '#E0E0E0',           // Off-White (High Contrast)
+    textLight: '#B0B0B0',      // Light Grey
+    border: '#333333',         // Dark Border
+    error: '#CF6679',          // Material Error
+    success: '#81C784',        // Material Success
+    warning: '#FFD54F',        // Material Warning
+    statusToDeliver: '#424242',
+    statusToDeliverText: '#FFF176',
+    statusDelivered: '#1B5E20',
+    statusDeliveredText: '#E8F5E9',
+    statusPartial: '#3E2723',
+    statusPartialText: '#FFCC80',
+    statusWaiting: '#01579B', // Deep Blue
+    statusWaitingText: '#E1F5FE',
+    statusDisputed: '#B71C1C', // Deep Red
+    statusDisputedText: '#FFEBEE',
 };
 
 export type ThemeType = 'light' | 'dark';

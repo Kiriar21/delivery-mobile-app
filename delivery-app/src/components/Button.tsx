@@ -6,6 +6,7 @@ interface ButtonProps extends TouchableOpacityProps {
     title: string;
     variant?: 'primary' | 'secondary' | 'outline';
     loading?: boolean;
+    textStyle?: any; // Allow custom text style overrides
 }
 
 export const Button: React.FC<ButtonProps> = ({ title, variant = 'primary', loading, style, ...props }) => {
@@ -40,7 +41,7 @@ export const Button: React.FC<ButtonProps> = ({ title, variant = 'primary', load
             {loading ? (
                 <ActivityIndicator color={getTextColor()} />
             ) : (
-                <Text style={[styles.text, { color: getTextColor() }]}>{title}</Text>
+                <Text style={[styles.text, { color: getTextColor() }, props.textStyle]}>{title}</Text>
             )}
         </TouchableOpacity>
     );

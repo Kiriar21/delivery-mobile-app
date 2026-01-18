@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Card } from '../components/Card';
-import { changelogData, getLatestVersion } from '../data/changelog';
+import { changelog, getLatestVersion } from '../data/changelog';
 
 export const InfoScreen = () => {
     const { colors } = useTheme();
@@ -31,10 +31,10 @@ export const InfoScreen = () => {
 
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Dziennik Zmian (Changelog)</Text>
 
-            {changelogData.map((log, index) => (
+            {changelog.map((log, index) => (
                 <Card key={index} style={styles.changelogCard}>
                     <View style={[styles.versionRow, { borderBottomColor: colors.border }]}>
-                        <Text style={[styles.versionText, { color: colors.primary }]}>{log.version}</Text>
+                        <Text style={[styles.versionText, { color: colors.primary }]}>v{log.version}</Text>
                         <Text style={[styles.dateText, { color: colors.textLight }]}>{log.date}</Text>
                     </View>
                     {log.changes.map((change, i) => (

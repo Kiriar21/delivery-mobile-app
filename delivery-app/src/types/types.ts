@@ -12,7 +12,8 @@ export interface Delivery {
     deliveryNumber: string;
     date: string; // ISO Date string YYYY-MM-DD
     address: string;
-    status: DeliveryStatus;
+    status: DeliveryStatus | string; // Allow string for raw mapping or mapped values
+    statusCode?: string; // Raw status from backend
     products: Product[];
     notes?: string;
     archived: boolean;
@@ -33,6 +34,9 @@ export type RootStackParamList = {
 export type MainTabParamList = {
     Home: undefined;
     Deliveries: undefined;
+    ClientActive: { filterType: 'client_active' };
+    ClientConfirm: { filterType: 'client_confirm' };
+    AdminDashboard: undefined;
     Info: undefined;
 };
 
@@ -50,4 +54,6 @@ export type RootStackParamListExpanded = {
     Main: undefined;
     DeliveryDetails: { deliveryId: string };
     DeliveryConfirmation: { deliveryId: string };
+    CreateDelivery: undefined;
+    Register: undefined;
 };
